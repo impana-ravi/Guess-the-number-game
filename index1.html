@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guess The Number Game</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:#6C63FF;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.container{
+width:500px;
+background:white;
+padding:30px;
+border-radius:20px;
+box-shadow:0 0 20px rgba(0,0,0,.4);
+text-align:center;
+}
+
+h1{
+color:#6C63FF;
+margin-bottom:20px;
+font-size:35px;
+}
+
+h2{
+margin-bottom:20px;
+color:#333;
+}
+
+p{
+margin:10px;
+font-size:18px;
+}
+
+button{
+padding:12px 25px;
+margin:8px;
+font-size:18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+transition:.3s;
+color:white;
+}
+
+button:hover{
+transform:scale(1.05);
+}
+
+.easy{
+background:#4CAF50;
+}
+
+.medium{
+background:#FF9800;
+}
+
+.hard{
+background:#F44336;
+}
+
+.start{
+background:#2196F3;
+}
+
+.guess{
+background:#9C27B0;
+}
+
+.hint{
+background:#009688;
+}
+
+.restart{
+background:#607D8B;
+}
+
+.home{
+background:#3F51B5;
+}
+
+.play{
+background:#4CAF50;
+}
+
+input{
+width:80%;
+padding:12px;
+font-size:20px;
+margin:15px;
+border-radius:8px;
+border:2px solid gray;
+text-align:center;
+}
+
+#gamePage,#resultPage{
+display:none;
+}
+
+.info{
+font-size:18px;
+margin:10px;
+font-weight:bold;
+}
+
+#message{
+font-size:22px;
+margin-top:15px;
+font-weight:bold;
+}
+
+.win{
+color:green;
+}
+
+.lose{
+color:red;
+}
+
+.high{
+color:orange;
+}
+
+.low{
+color:blue;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- HOME PAGE -->
+
+<div id="homePage">
+
+<h1>🎯 Guess The Number Game</h1>
+
+<h2>Select Difficulty</h2>
+
+<button class="easy" onclick="selectLevel('easy')">Easy</button>
+
+<button class="medium" onclick="selectLevel('medium')">Medium</button>
+
+<button class="hard" onclick="selectLevel('hard')">Hard</button>
+
+<br><br>
+
+<p id="selected">Selected Level : Easy</p>
+
+<button class="start" onclick="startGame()">Start Game</button>
+
+</div>
+
+<!-- GAME PAGE -->
+
+<div id="gamePage">
+
+<h1>Guess The Number</h1>
+
+<p id="levelName"></p>
+
+<input type="number" id="guessInput" placeholder="Enter Number">
+
+<br>
+
+<button class="guess" onclick="checkGuess()">Guess</button>
+
+<button class="hint" onclick="showHint()">Hint</button>
+
+<button class="restart" onclick="restartGame()">Restart</button>
+
+<div class="info" id="attempts"></div>
+
+<div class="info" id="score"></div>
+
+<div id="message"></div>
+
+</div>
+
+<!-- RESULT PAGE -->
+
+<div id="resultPage">
+
+<h1>Game Result</h1>
+
+<h2 id="resultTitle"></h2>
+
+<p id="resultNumber"></p>
+
+<p id="resultAttempt"></p>
+
+<p id="resultScore"></p>
+
+<button class="play" onclick="restartGame()">Play Again</button>
+
+<button class="home" onclick="goHome()">Home</button>
+
+</div>
+
+</div>
+
+<script>
+
+let level="easy";
+let maxNumber=20;
+let maxAttempts=10;
+
+let secretNumber=0;
+let attempts=0;
+let score=100;
+
+function selectLevel(l){
+
+level=l;
+
+if(level=="easy"){
+maxNumber=20;
+maxAttempts=10;
+}
+
+if(level=="medium"){
+maxNumber=50;
+maxAttempts=8;
+}
+
+if(level=="hard"){
+maxNumber=100;
+maxAttempts=6;
+}
+
+document.getElementById("selected").innerHTML=
+"Selected Level : "+level.toUpperCase();
+
+}
+
+function startGame(){
+
+secretNumber=Math.floor(Math.random()*maxNumber)+1;
+
+attempts=0;
+
+score=100;
+
+document.getElementById("homePage").style.display="none";
+
+document.getElementById("resultPage").style.display="none";
+
+document.getElementById("gamePage").style.display="block";
+
+document.getElementById("guessInput").value="";
+
+document.getElementById("guessInput").disabled=false;
+
+document.getElementById("levelName").innerHTML=
+"Guess a number between 1 and "+maxNumber;
+
+document.getElementById("message").innerHTML="";
+
+updateInfo();
+
+}
+
+function updateInfo(){
+
+document.getElementById("attempts").innerHTML=
+"Attempts Left : "+(maxAttempts-attempts);
+
+document.getElementById("score").innerHTML=
+"Score : "+score;
+
+}
+
+function checkGuess(){
+
+let guess=parseInt(document.getElementById("guessInput").value);
+
+if(isNaN(guess)){
+alert("Please enter a number.");
+return;
+}
+
+attempts++;
+
+score-=10;
+
+if(guess==secretNumber){
+
+document.getElementById("message").innerHTML=
+"<span class='win'>🎉 Correct Guess!</span>";
+
+setTimeout(function(){
+showResult(true);
+},1200);
+
+return;
+
+}
+
+if(guess>secretNumber){
+
+document.getElementById("message").innerHTML=
+"<span class='high'>⬆ Too High</span>";
+
+}
+else{
+
+document.getElementById("message").innerHTML=
+"<span class='low'>⬇ Too Low</span>";
+
+}
+
+updateInfo();
+
+if(attempts>=maxAttempts){
+
+setTimeout(function(){
+showResult(false);
+},1000);
+
+}
+
+}
+
+function showHint(){
+
+let hint="";
+
+if(secretNumber%2==0)
+hint+="Even Number<br>";
+else
+hint+="Odd Number<br>";
+
+if(secretNumber>maxNumber/2)
+hint+="Greater than "+maxNumber/2+"<br>";
+else
+hint+="Less than "+maxNumber/2+"<br>";
+
+if(secretNumber%5==0)
+hint+="Divisible by 5";
+else
+hint+="Not Divisible by 5";
+
+document.getElementById("message").innerHTML=
+"<span style='color:purple;'>💡 Hint:<br>"+hint+"</span>";
+
+}
+function showResult(win){
+
+document.getElementById("gamePage").style.display="none";
+
+document.getElementById("resultPage").style.display="block";
+
+if(win){
+
+document.getElementById("resultTitle").innerHTML=
+"🏆 Congratulations! You Won!";
+
+document.getElementById("resultTitle").className="win";
+
+}
+else{
+
+document.getElementById("resultTitle").innerHTML=
+"😢 Game Over";
+
+document.getElementById("resultTitle").className="lose";
+
+}
+
+document.getElementById("resultNumber").innerHTML=
+"<b>Secret Number :</b> "+secretNumber;
+
+document.getElementById("resultAttempt").innerHTML=
+"<b>Total Attempts :</b> "+attempts;
+
+document.getElementById("resultScore").innerHTML=
+"<b>Final Score :</b> "+Math.max(score,0);
+
+}
+
+function restartGame(){
+
+secretNumber=Math.floor(Math.random()*maxNumber)+1;
+
+attempts=0;
+
+score=100;
+
+document.getElementById("guessInput").value="";
+
+document.getElementById("guessInput").disabled=false;
+
+document.getElementById("message").innerHTML="";
+
+document.getElementById("resultPage").style.display="none";
+
+document.getElementById("gamePage").style.display="block";
+
+updateInfo();
+
+}
+
+function goHome(){
+
+document.getElementById("resultPage").style.display="none";
+
+document.getElementById("gamePage").style.display="none";
+
+document.getElementById("homePage").style.display="block";
+
+document.getElementById("guessInput").value="";
+
+document.getElementById("message").innerHTML="";
+
+}
+
+</script>
+
+</body>
+</html>
